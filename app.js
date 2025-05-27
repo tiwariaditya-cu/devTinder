@@ -47,6 +47,6 @@ connectDB()
 
 })
 .catch((err)=>{
-    console.error("databse is not connected");
+    console.error("databse is  connected");
 });
 
