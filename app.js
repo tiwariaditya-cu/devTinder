@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const {validateSignUpData} = require('./src/utils/validation');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
+const { userAuth } = require('./src/middleware/auth');
 
 
 app.use(express.json());
@@ -52,7 +53,7 @@ app.post('/login', async(req,res)=>{
 
     if(isPasswordValid){
 
-        const token = await jwt.sign({_id:user._id},"kuchsecret");
+        const token = await jwt.sign({_id:user._id},"kuchsecret",{expiresIn: "1d"});
         console.log(token);
 
         res.cookie("token", token);
@@ -68,35 +69,13 @@ catch(err){
 
 });
 
-app.get('/profile', async(req,res)=>{
-
-
+app.get('/profile',userAuth, async(req,res)=>{
     try{
-
-    const cookies = req.cookies;
-
-    const {token}=cookies;
-    if(!token){
-        throw new Error("invalid token");
-
-    }
-
-    const decodedMessage = await jwt.verify(token, "kuchsecret"); 
-
-    const{_id}=decodedMessage;
-    console.log("Logged in user is"+ _id);
-
-    const user = await User.findById(_id);
-    if(!user){
-        throw new Error("user does not exist");
-    }
-
-    res.send(user);
-}catch(err){
-    res.status(400).send("Error"+err.message);
+        const user = req.user;
+        res.send(user);
+    }catch(err){
+     res.status(400).send("Error"+err.message);
 }
-
-
 });
 
 
