@@ -63,4 +63,19 @@ catch(err){
 
 });
 
+
+authRouter.post('/logout', (req,res)=>{
+    try{
+
+        res.cookie('token', null, {
+            expires: new Date(Date.now()),
+        });
+
+        res.send("Logout Successful.");
+
+    }catch(err){
+        res.status(400).send("Error"+err.message);
+    }
+});
+
 module.exports = authRouter;
